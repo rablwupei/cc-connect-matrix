@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/chenhg5/cc-connect/core"
@@ -184,17 +185,28 @@ func loadFileAttachments(paths []string) ([]core.FileAttachment, error) {
 	return files, nil
 }
 
-const maxAttachmentSize = 50 << 20 // 50 MB
+const defaultMaxAttachmentSize int64 = 1 << 30 // 1 GB
+
+func getMaxAttachmentSize() int64 {
+	if s := os.Getenv("CC_MAX_ATTACHMENT_SIZE"); s != "" {
+		if v, err := strconv.ParseInt(s, 10, 64); err == nil && v > 0 {
+			return v
+		}
+	}
+	return defaultMaxAttachmentSize
+}
 
 func readAttachment(path string) ([]byte, string, string, error) {
 	cleaned := filepath.Clean(path)
+
+	maxSize := getMaxAttachmentSize()
 
 	info, err := os.Stat(cleaned)
 	if err != nil {
 		return nil, "", "", fmt.Errorf("read attachment %s: %w", path, err)
 	}
-	if info.Size() > maxAttachmentSize {
-		return nil, "", "", fmt.Errorf("attachment %s exceeds size limit (%d MB)", path, maxAttachmentSize>>20)
+	if info.Size() > maxSize {
+		return nil, "", "", fmt.Errorf("attachment %s exceeds size limit (%d MB)", path, maxSize>>20)
 	}
 
 	data, err := os.ReadFile(cleaned)

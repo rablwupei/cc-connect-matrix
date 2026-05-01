@@ -36,6 +36,12 @@
 # 不带附件的 `cc-connect send --message` 不受影响。
 # attachment_send = "on"
 
+# Maximum attachment file size in MB for `cc-connect send --file/--image`.
+# Default: 1024 (1 GB). Set to 0 to use the default.
+# `cc-connect send --file/--image` 的最大附件大小（单位 MB）。
+# 默认 1024（即 1 GB）。设为 0 使用默认值。
+# max_attachment_size_mb = 1024
+
 [log]
 level = "info" # debug, info, warn, error
 

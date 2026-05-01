@@ -83,6 +83,8 @@ func TestDetectAttachmentMimeType_UsesExtensionFallback(t *testing.T) {
 }
 
 func TestReadAttachment_SizeLimit(t *testing.T) {
+	// Set a small limit via env var for testing
+	t.Setenv("CC_MAX_ATTACHMENT_SIZE", "100") // 100 bytes
 	dir := t.TempDir()
 	small := filepath.Join(dir, "small.txt")
 	if err := os.WriteFile(small, []byte("hello"), 0o644); err != nil {
@@ -97,13 +99,28 @@ func TestReadAttachment_SizeLimit(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := f.Truncate(maxAttachmentSize + 1); err != nil {
+	if err := f.Truncate(101); err != nil { // just over 100 bytes
 		f.Close()
 		t.Fatal(err)
 	}
 	f.Close()
 	if _, _, _, err := readAttachment(big); err == nil {
 		t.Fatal("oversized file should be rejected")
+	}
+}
+
+func TestGetMaxAttachmentSize_Default(t *testing.T) {
+	// Without env var, default is 1GB
+	os.Unsetenv("CC_MAX_ATTACHMENT_SIZE")
+	if v := getMaxAttachmentSize(); v != 1<<30 {
+		t.Fatalf("default max size = %d, want %d", v, int64(1<<30))
+	}
+}
+
+func TestGetMaxAttachmentSize_EnvOverride(t *testing.T) {
+	t.Setenv("CC_MAX_ATTACHMENT_SIZE", "104857600") // 100MB
+	if v := getMaxAttachmentSize(); v != 104857600 {
+		t.Fatalf("env override max size = %d, want 104857600", v)
 	}
 }
 

@@ -169,6 +169,10 @@ func main() {
 	config.ConfigPath = configPath
 	slog.Info("config loaded", "path", configPath)
 
+	if cfg.MaxAttachmentSizeMB > 0 {
+		os.Setenv("CC_MAX_ATTACHMENT_SIZE", fmt.Sprintf("%d", int64(cfg.MaxAttachmentSizeMB)*1024*1024))
+	}
+
 	if len(cfg.Projects) == 0 {
 		fmt.Fprintf(os.Stderr, "Error: no projects configured in %s\n", configPath)
 		fmt.Fprintln(os.Stderr, "Add at least one [[project]] section to your config.toml, or run:")
@@ -1370,6 +1374,13 @@ func reloadConfig(configPath, projName string, engine *core.Engine) (*core.Confi
 	cfg, err := config.Load(configPath)
 	if err != nil {
 		return nil, fmt.Errorf("reload config: %w", err)
+	}
+
+	// Sync attachment size env var on reload
+	if cfg.MaxAttachmentSizeMB > 0 {
+		os.Setenv("CC_MAX_ATTACHMENT_SIZE", fmt.Sprintf("%d", int64(cfg.MaxAttachmentSizeMB)*1024*1024))
+	} else {
+		os.Unsetenv("CC_MAX_ATTACHMENT_SIZE")
 	}
 
 	result := &core.ConfigReloadResult{}

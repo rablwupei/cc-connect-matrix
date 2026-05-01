@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -135,7 +136,13 @@ func (s *APIServer) handleSend(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	const maxSendBody = 52 << 20 // 52 MB (slightly above max attachment to account for base64 overhead)
+	const defaultMaxSendBody int64 = 52 << 20 // 52 MB
+	maxSendBody := defaultMaxSendBody
+	if s := os.Getenv("CC_MAX_ATTACHMENT_SIZE"); s != "" {
+		if v, err := strconv.ParseInt(s, 10, 64); err == nil && v > 0 {
+			maxSendBody = v + 2<<20 // attachment limit + 2MB overhead
+		}
+	}
 	var req SendRequest
 	if err := json.NewDecoder(io.LimitReader(r.Body, maxSendBody)).Decode(&req); err != nil {
 		http.Error(w, "invalid JSON: "+err.Error(), http.StatusBadRequest)

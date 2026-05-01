@@ -116,6 +116,7 @@ type Config struct {
 	// setting so the reaper policy is consistent across projects; per-project
 	// configuration is intentionally not supported.
 	WorkspaceIdleTimeoutMins *int `toml:"workspace_idle_timeout_mins,omitempty"`
+	MaxAttachmentSizeMB      int  `toml:"max_attachment_size_mb,omitempty"` // max file size for cc-connect send; default 1024 (1GB)
 }
 
 // CronConfig controls cron job behavior.
