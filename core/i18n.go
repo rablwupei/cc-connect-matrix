@@ -151,6 +151,7 @@ const (
 	MsgPermissionHint            MsgKey = "permission_hint"
 	MsgQuietOn                   MsgKey = "quiet_on"
 	MsgQuietOff                  MsgKey = "quiet_off"
+	MsgDisplayModeCompact        MsgKey = "display_mode_compact"
 	MsgQuietGlobalOn             MsgKey = "quiet_global_on"
 	MsgQuietGlobalOff            MsgKey = "quiet_global_off"
 	MsgModeChanged               MsgKey = "mode_changed"
@@ -161,6 +162,7 @@ const (
 	MsgLangInvalid               MsgKey = "lang_invalid"
 	MsgLangCurrent               MsgKey = "lang_current"
 	MsgUnknownCommand            MsgKey = "unknown_command"
+	MsgWelcome                   MsgKey = "welcome"
 	MsgHelp                      MsgKey = "message_help" // change from "help", which is used now for builtin command help
 	MsgHelpTitle                 MsgKey = "help_title"
 	MsgHelpSessionSection        MsgKey = "help_session_section"
@@ -803,6 +805,13 @@ var messages = map[MsgKey]map[Language]string{
 		LangJapanese:           "🔔 静音モード OFF — 思考とツール実行の進捗メッセージを表示します。",
 		LangSpanish:            "🔔 Modo silencioso desactivado — los mensajes de progreso se mostrarán.",
 	},
+	MsgDisplayModeCompact: {
+		LangEnglish:            "📋 Compact mode — thinking/tool hidden, each text segment sent separately.",
+		LangChinese:            "📋 紧凑模式 — 隐藏思考和工具消息，每段文本独立发送。",
+		LangTraditionalChinese: "📋 緊湊模式 — 隱藏思考和工具訊息，每段文字獨立發送。",
+		LangJapanese:           "📋 コンパクトモード — 思考・ツール非表示、テキストは個別に送信。",
+		LangSpanish:            "📋 Modo compacto — pensamiento/herramientas ocultos, cada segmento de texto enviado por separado.",
+	},
 	MsgQuietGlobalOn: {
 		LangEnglish:            "🔇 Global quiet mode ON — all sessions will hide thinking and tool progress.",
 		LangChinese:            "🔇 全局安静模式已开启 — 所有会话将不再推送思考和工具调用进度消息。",
@@ -872,6 +881,13 @@ var messages = map[MsgKey]map[Language]string{
 		LangTraditionalChinese: "`%s` 不是 cc-connect 命令，已轉發給 Agent 處理...",
 		LangJapanese:           "`%s` は cc-connect のコマンドではありません。エージェントに転送します...",
 		LangSpanish:            "`%s` no es un comando de cc-connect, reenviando al agente...",
+	},
+	MsgWelcome: {
+		LangEnglish:            "👋 Hi! I'm cc-connect, bridging you to **%s**.\n\nJust send a message to chat with the agent. Type /help to see built-in commands.",
+		LangChinese:            "👋 你好！我是 cc-connect，已为你连接到 **%s**。\n\n直接发送消息即可与 Agent 对话。输入 /help 查看内置命令。",
+		LangTraditionalChinese: "👋 你好！我是 cc-connect，已為你連接到 **%s**。\n\n直接發送訊息即可與 Agent 對話。輸入 /help 查看內建命令。",
+		LangJapanese:           "👋 こんにちは！cc-connect が **%s** に接続しました。\n\nメッセージを送信すればエージェントと会話できます。/help で組み込みコマンド一覧を確認できます。",
+		LangSpanish:            "👋 ¡Hola! Soy cc-connect, conectándote con **%s**.\n\nEnvía un mensaje para chatear con el agente. Usa /help para ver los comandos integrados.",
 	},
 	MsgHelp: {
 		LangEnglish: "📖 Available Commands\n\n" +
