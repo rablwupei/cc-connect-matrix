@@ -680,7 +680,7 @@ func (p *Platform) downloadMediaContent(ctx context.Context, contentURL id.Conte
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	return io.ReadAll(resp.Body)
 }
 

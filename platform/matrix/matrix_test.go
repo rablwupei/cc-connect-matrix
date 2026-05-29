@@ -668,7 +668,8 @@ func TestInterfaceCompliance(t *testing.T) {
 		t.Fatalf("New() error: %v", err)
 	}
 
-	var _ core.Platform = p
+	// Verify Platform interface is satisfied at compile time
+	var _ core.Platform = (*Platform)(nil)
 
 	if _, ok := p.(core.AsyncRecoverablePlatform); !ok {
 		t.Error("should implement AsyncRecoverablePlatform")
