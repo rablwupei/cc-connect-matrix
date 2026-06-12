@@ -173,7 +173,7 @@ If you see `E2EE not available`, encryption initialization failed. Encrypted roo
 | `allow_from` | No | `"*"` | Comma-separated user IDs allowed to interact, or `"*"` for all |
 | `auto_join` | No | `true` | Automatically accept room invitations |
 | `auto_verify` | No | `true` | Auto-accept SAS key verification requests |
-| `cross_signing_password` | No | `""` | Bot account password for cross-signing key setup (one-time, needed on first run or when keys are reset) |
+| `cross_signing_password` | No | `""` | Bot account password for cross-signing key setup (one-time, needed on first run or when keys are reset). Can also be set via `MATRIX_CROSS_SIGNING_PASSWORD` environment variable (takes precedence over config file) |
 | `share_session_in_channel` | No | `false` | Share a single agent session among all users in a room |
 | `group_reply_all` | No | `false` | Respond to all messages in group rooms (not just mentions) |
 | `proxy` | No | `""` | HTTP or SOCKS5 proxy URL |
@@ -204,6 +204,15 @@ Make sure `auto_join = true` (this is the default). If the bot was already invit
 ### Q: E2EE (End-to-End Encryption)
 
 cc-connect supports encrypted rooms (E2EE) when built with the `goolm` build tag. If you see `matrix: E2EE enabled` at startup, encryption is working. If you see `matrix: E2EE not available (build with -tags goolm to enable)`, rebuild with E2EE support:
+
+> **Data storage**: E2EE crypto data is stored under `~/.cc-connect/` (created with `0700` permissions):
+> - `matrix-crypto-<device_id>.db` — encryption key database (one per device)
+> - `matrix-cross-signing-<device_id>.json` — cross-signing seed (one per device)
+>
+> To reset E2EE (e.g. after changing device or reinstalling), delete these files and restart cc-connect:
+> ```bash
+> rm ~/.cc-connect/matrix-crypto-*.db* ~/.cc-connect/matrix-cross-signing-*.json
+> ```
 
 ```bash
 go build -tags goolm ./cmd/cc-connect
@@ -249,13 +258,19 @@ The `access_token` in the response can be used in config. The `device_id` will b
 
 This means the bot's device hasn't been cross-signed. cc-connect automatically sets up cross-signing on first run, but some Matrix servers require password authentication (UIA) to publish the cross-signing keys.
 
-If logs show `no supported UIA flow for cross-signing`, add the bot account's password to config:
+If logs show `no supported UIA flow for cross-signing`, provide the bot account's password. You can set it in config:
 
 ```toml
 cross_signing_password = "your-bot-password"
 ```
 
-This is a one-time operation — once cross-signing keys are published and saved, the password is no longer needed.
+Or preferably via environment variable (avoids storing the password in the config file):
+
+```bash
+export MATRIX_CROSS_SIGNING_PASSWORD="your-bot-password"
+```
+
+The environment variable takes precedence over the config file value. This is a one-time operation — once cross-signing keys are published and saved, remove the password from config or unset the environment variable.
 
 #### How to verify the bot's device?
 

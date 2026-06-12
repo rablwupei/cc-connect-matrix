@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -92,6 +93,9 @@ func New(opts map[string]any) (core.Platform, error) {
 	}
 	proxyURL, _ := opts["proxy"].(string)
 	crossSigningPassword, _ := opts["cross_signing_password"].(string)
+	if env := os.Getenv("MATRIX_CROSS_SIGNING_PASSWORD"); env != "" {
+		crossSigningPassword = env
+	}
 
 	httpClient := &http.Client{Timeout: 120 * time.Second}
 	if proxyURL != "" {
